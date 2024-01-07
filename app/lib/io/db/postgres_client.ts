@@ -7,13 +7,18 @@ export class PostgresClient implements DbClient {
   private pool: Pool;
 
   constructor(config: PostgresConfig) {
-    this.pool = new Pool({
+    const cfg: any = {
       ...config,
-      ssl: {
+    };
+    if (cfg.sslmode === "disable") {
+      cfg.ssl = false;
+    } else {
+      cfg.ssl = {
         rejectUnauthorized: false,
         ca: config.certificate,
-      },
-    });
+      };
+    }
+    this.pool = new Pool(cfg);
   }
 
   async initialize(): Promise<void> {}
